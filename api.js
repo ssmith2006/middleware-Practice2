@@ -1,13 +1,12 @@
 import express from "express";
-import {validateBook} from "./validateBook.js";
 
-const router =express.Router();
+app.use(express.json());
 
 let books = [];
-let idCounter = 1
+let idCounter = 1;
 
 //Return all books
-router.get("/books", (req, res) => {
+app.get("/books", (req, res) => {
   res.status(200).json({
     message: "All books have been returned!",
     data: books,
@@ -15,13 +14,13 @@ router.get("/books", (req, res) => {
 });
 
 //Add a new book
-router.post("/books/", validateBook, (req, res) => {
+app.post("/books", (req, res) => {
   const newBook = {
     id: idCounter,
     title: "The Hobbit",
     author: "J.R.R. Tolkien",
     genre: "Fantasy",
-    price: 15.99
+    price: 15.99,
   };
   books.push(newBook);
   idCounter++,
@@ -32,7 +31,7 @@ router.post("/books/", validateBook, (req, res) => {
 });
 
 //Return one book by ID
-router.get("/books/:id", (req, res) => {
+app.get("/books/:id", (req, res) => {
   const bookId = req.params.id;
   const book = books.find((book) => book.id === Number(bookId));
 
@@ -48,7 +47,7 @@ router.get("/books/:id", (req, res) => {
 });
 
 //Update a book's information
-router.put("/books/:id", (req, res) => {
+app.put("/books/:id", (req, res) => {
   const bookId = Number(req.params.id);
   const idx = books.findIndex((book) => book.id === bookId);
 
@@ -66,7 +65,7 @@ router.put("/books/:id", (req, res) => {
 });
 
 //Delete book by ID
-router.delete("/books/:id", (req, res) => {
+app.delete("/books/:id", (req, res) => {
   const bookId = Number(req.params.id);
   const idx = books.findIndex((book) => book.id === bookId);
 
@@ -80,5 +79,3 @@ router.delete("/books/:id", (req, res) => {
     message: "Book deleted successfully.",
   });
 });
-
-export default router;
