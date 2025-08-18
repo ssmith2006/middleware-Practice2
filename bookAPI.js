@@ -17,9 +17,9 @@ app.get("/books", (req, res) => {
 
 //Add a new book
 app.post("/books", (req, res) => {
-  const { title, author, genre, price} = req.body;
+  const { title, author, genre, price } = req.body;
   const newBook = {
-    id: idCounter ++,
+    id: idCounter++,
     title,
     author,
     genre,
@@ -80,5 +80,88 @@ app.delete("/books/:id", (req, res) => {
   books.splice(idx, 1);
   res.status(200).json({
     message: "Book deleted successfully.",
+  });
+});
+
+//Get books by specific genre
+app.get("/books/genre/:genre", (req, res) => {
+  const genre = req.params.genre.toLowerCase();
+  const result = books.filter((book) => book.genre.toLowerCase() === genre);
+  res.status(200).json({
+    status: 200,
+    message: "Books returned.",
+    data: result,
+  });
+});
+
+//search by term
+app.get("/books/search/:term", (req, res) => {
+  const term = req.params.term.toLowerCase();
+  const result = books.filter(
+    (book) =>
+      book.title.toLowerCase().includes(term) ||
+      book.author.toLowerCase().includes(term)
+  );
+  res.json({
+    status: 200,
+    message: "Book found by title",
+    data: result,
+  });
+});
+
+//
+app.get("/books/price-range/:min/:max", (req, res) => {
+  const min = Number(req.params.min);
+  const max = Number(req.params.max);
+  const result = books.filter((book) => book.price >= min && book.price <= max);
+  res.json({
+    status: 200,
+    message: "Book(s) in range retrieved.",
+    data: result,
+  });
+});
+
+//Average price of the book
+app.get("/books/average", (req, res) => {
+  let total = 0;
+
+  books.map((book) => (total += book.price));
+
+  const average = total / books.length;
+
+  if (books.length === 0)
+    return res.json({
+      status: 404,
+      message: "No average found.",
+      data: 0,
+    });
+
+  res.json({
+    status: 200,
+    message: "Average calculated.",
+    data: average,
+  });
+});
+
+//Find cheapest book
+app.get("/books/cheapest", (req, res) => {
+  if (books.length === 0)
+    return res.json({
+      status: 404,
+      message: "Cheapest book not found.",
+      data: 0,
+    });
+
+  let cheapest = books[0];
+
+  books.forEach((book) => {
+    if (book.price < cheapest.price) {
+      cheapest = book;
+    }
+  });
+  res.json({
+    status: 200,
+    message: "Cheapest book found.",
+    result: cheapest,
   });
 });
